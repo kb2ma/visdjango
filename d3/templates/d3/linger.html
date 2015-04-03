@@ -1,0 +1,27 @@
+{# D3 Example Linger #}
+{% extends 'd3/base.html' %}
+{% load staticfiles %}
+{% block title %}Linger Network Graph{% endblock %}
+{% block extrahead %}
+  {{ block.super }}
+  <link href="{% static 'd3/css/linger.css' %}" rel="stylesheet">
+  <script src="//cdn.jsdelivr.net/filesaver.js/0.1/FileSaver.min.js"></script>
+  <script src="{% static 'd3/js/linger.js' %}"></script>
+{% endblock extrahead %}
+
+{%  block content %}
+
+  <div class="page-header">
+    <h1>Linger Network Graph with D3</h1>
+  </div>
+  
+  <div id="graph">
+    <div id="toolbox">
+      <input type="file" id="hidden-file-upload">
+      <input id="upload-input" type="image" title="upload graph" src="{% static 'd3/img/upload-icon.png' %}" alt="upload graph">
+      <input type="image" id="download-input" title="download graph" src="{% static 'd3/img/download-icon.png' %}" alt="download graph">
+      <input type="image" id="delete-graph" title="delete graph" src="{% static 'd3/img/trash-icon.png' %}" alt="delete graph">
+    </div>
+  </div>
+
+{% endblock %}

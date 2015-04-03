@@ -10,6 +10,7 @@ urlpatterns = patterns('',
   url(r'^barchart/', views.barchart, name='d3-barchart'),
   url(r'^scatterplot/', views.scatterplot, name='d3-scatterplot'),
   url(r'^scatterplot-2/', views.scatterplot_2, name='d3-scatterplot-2'),
+  url(r'^linger/', views.linger, name='d3-linger'),
 
   #
   # Data resources

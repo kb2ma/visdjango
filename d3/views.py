@@ -23,6 +23,9 @@ def scatterplot(request):
 def scatterplot_2(request):
     return render(request, 'd3/scatterplot_2.html')
 
+def linger(request):
+    return render(request, 'd3/linger.html')
+
 #
 # AJAX Actions
 #
