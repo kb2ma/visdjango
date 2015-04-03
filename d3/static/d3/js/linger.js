@@ -132,9 +132,10 @@ function create_linger() {
 
 
     // handle uploaded data
-    d3.select("#upload-input").on("click", function(){
-      document.getElementById("hidden-file-upload").click();
-    });
+    // 2015-04-02 kbee Comment since we are removing these functions.
+    //d3.select("#upload-input").on("click", function(){
+    //  document.getElementById("hidden-file-upload").click();
+    //});
     // 2015-03-28 kbee Comment this function to remove reference Blob.
     /*
     d3.select("#hidden-file-upload").on("change", function(){
@@ -172,9 +173,10 @@ function create_linger() {
     */
 
     // handle delete graph
-    d3.select("#delete-graph").on("click", function(){
-      thisGraph.deleteGraph(false);
-    });
+    // 2015-04-02 kbee Comment since we are removing these functions.
+    //d3.select("#delete-graph").on("click", function(){
+    //  thisGraph.deleteGraph(false);
+    //});
   };
 
   // Finished GraphCreator initial definition. Now set up prototype.
@@ -209,18 +211,19 @@ function create_linger() {
     }
   };
 
-  GraphCreator.prototype.deleteGraph = function(skipPrompt){
-    var thisGraph = this,
-        doDelete = true;
-    if (!skipPrompt){
-      doDelete = window.confirm("Press OK to delete this graph");
-    }
-    if(doDelete){
-      thisGraph.nodes = [];
-      thisGraph.edges = [];
-      thisGraph.updateGraph();
-    }
-  };
+  // 2015-04-02 kbee Commented since no longer used.
+  //GraphCreator.prototype.deleteGraph = function(skipPrompt){
+  //  var thisGraph = this,
+  //      doDelete = true;
+  //  if (!skipPrompt){
+  //    doDelete = window.confirm("Press OK to delete this graph");
+  //  }
+  //  if(doDelete){
+  //    thisGraph.nodes = [];
+  //    thisGraph.edges = [];
+  //    thisGraph.updateGraph();
+  //  }
+  //};
 
   /* select all text in element: taken from http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element */
   GraphCreator.prototype.selectElementContents = function(el) {
