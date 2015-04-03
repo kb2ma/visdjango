@@ -30,29 +30,6 @@ function create_linger() {
       selectedText: null
     };
 
-    // define arrow markers for graph links
-    var defs = svg.append('svg:defs');
-    defs.append('svg:marker')
-      .attr('id', 'end-arrow')
-      .attr('viewBox', '0 -5 10 10')
-      .attr('refX', "32")
-      .attr('markerWidth', 3.5)
-      .attr('markerHeight', 3.5)
-      .attr('orient', 'auto')
-      .append('svg:path')
-      .attr('d', 'M0,-5L10,0L0,5');
-
-    // define arrow markers for leading arrow
-    defs.append('svg:marker')
-      .attr('id', 'mark-end-arrow')
-      .attr('viewBox', '0 -5 10 10')
-      .attr('refX', 7)
-      .attr('markerWidth', 3.5)
-      .attr('markerHeight', 3.5)
-      .attr('orient', 'auto')
-      .append('svg:path')
-      .attr('d', 'M0,-5L10,0L0,5');
-
     thisGraph.svg = svg;
     // top level group for graph
     thisGraph.svgG = svg.append("g")
@@ -62,8 +39,7 @@ function create_linger() {
     // displayed when dragging between nodes
     thisGraph.dragLine = svgG.append('svg:path')
           .attr('class', 'link dragline hidden')
-          .attr('d', 'M0,0L0,0')
-          .style('marker-end', 'url(#mark-end-arrow)');
+          .attr('d', 'M0,0L0,0');
 
     // svg nodes and edges
     thisGraph.paths = svgG.append("g").selectAll("g");
@@ -118,65 +94,6 @@ function create_linger() {
 
     // listen for resize
     window.onresize = function(){thisGraph.updateWindow(svg);};
-
-    // 2015-03-28 kbee Comment this function to remove references to saveAs and Blob.
-    // handle download data
-    //d3.select("#download-input").on("click", function(){
-    //  var saveEdges = [];
-    //  thisGraph.edges.forEach(function(val, i){
-    //    saveEdges.push({source: val.source.id, target: val.target.id});
-    //  });
-    //  var blob = new Blob([window.JSON.stringify({"nodes": thisGraph.nodes, "edges": saveEdges})], {type: "text/plain;charset=utf-8"});
-    //  saveAs(blob, "mydag.json");
-    //});
-
-
-    // handle uploaded data
-    // 2015-04-02 kbee Comment since we are removing these functions.
-    //d3.select("#upload-input").on("click", function(){
-    //  document.getElementById("hidden-file-upload").click();
-    //});
-    // 2015-03-28 kbee Comment this function to remove reference Blob.
-    /*
-    d3.select("#hidden-file-upload").on("change", function(){
-      if (window.File && window.FileReader && window.FileList && window.Blob) {
-        var uploadFile = this.files[0];
-        var filereader = new window.FileReader();
-
-        filereader.onload = function(){
-          var txtRes = filereader.result;
-          // TODO better error handling
-          try{
-            var jsonObj = JSON.parse(txtRes);
-            thisGraph.deleteGraph(true);
-            thisGraph.nodes = jsonObj.nodes;
-            thisGraph.setIdCt(jsonObj.nodes.length + 1);
-            var newEdges = jsonObj.edges;
-            newEdges.forEach(function(e, i){
-              newEdges[i] = {source: thisGraph.nodes.filter(function(n){return n.id == e.source;})[0],
-                          target: thisGraph.nodes.filter(function(n){return n.id == e.target;})[0]};
-            });
-            thisGraph.edges = newEdges;
-            thisGraph.updateGraph();
-          }catch(err){
-            window.alert("Error parsing uploaded file\nerror message: " + err.message);
-            return;
-          }
-        };
-        filereader.readAsText(uploadFile);
-
-      } else {
-        alert("Your browser won't let you save this graph -- try upgrading your browser to IE 10+ or Chrome or Firefox.");
-      }
-
-    });
-    */
-
-    // handle delete graph
-    // 2015-04-02 kbee Comment since we are removing these functions.
-    //d3.select("#delete-graph").on("click", function(){
-    //  thisGraph.deleteGraph(false);
-    //});
   };
 
   // Finished GraphCreator initial definition. Now set up prototype.
@@ -210,20 +127,6 @@ function create_linger() {
       thisGraph.updateGraph();
     }
   };
-
-  // 2015-04-02 kbee Commented since no longer used.
-  //GraphCreator.prototype.deleteGraph = function(skipPrompt){
-  //  var thisGraph = this,
-  //      doDelete = true;
-  //  if (!skipPrompt){
-  //    doDelete = window.confirm("Press OK to delete this graph");
-  //  }
-  //  if(doDelete){
-  //    thisGraph.nodes = [];
-  //    thisGraph.edges = [];
-  //    thisGraph.updateGraph();
-  //  }
-  //};
 
   /* select all text in element: taken from http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element */
   GraphCreator.prototype.selectElementContents = function(el) {
@@ -339,14 +242,18 @@ function create_linger() {
     var nodeBCR = htmlEl.getBoundingClientRect(),
         curScale = nodeBCR.width/consts.nodeRadius,
         placePad  =  5*curScale,
-        useHW = curScale > 1 ? nodeBCR.width*0.71 : consts.nodeRadius*1.42;
+        useHW = curScale > 1 ? nodeBCR.width*0.71 : consts.nodeRadius*1.42,
+        // Must translate edit location for graph HTML offset from origin
+        htmlX = thisGraph.svg.attr("htmlX"),
+        htmlY = thisGraph.svg.attr("htmlY");
+        
     // replace with editableconent text
     var d3txt = thisGraph.svg.selectAll("foreignObject")
           .data([d])
           .enter()
           .append("foreignObject")
-          .attr("x", nodeBCR.left + placePad )
-          .attr("y", nodeBCR.top + placePad)
+          .attr("x", nodeBCR.left + placePad - htmlX)
+          .attr("y", nodeBCR.top + placePad - htmlY)
           .attr("height", 2*useHW)
           .attr("width", useHW)
           .append("xhtml:p")
@@ -509,8 +416,7 @@ function create_linger() {
     });
     var paths = thisGraph.paths;
     // update existing paths
-    paths.style('marker-end', 'url(#end-arrow)')
-      .classed(consts.selectedClass, function(d){
+    paths.classed(consts.selectedClass, function(d){
         return d === state.selectedEdge;
       })
       .attr("d", function(d){
@@ -520,7 +426,6 @@ function create_linger() {
     // add new paths
     paths.enter()
       .append("path")
-      .style('marker-end','url(#end-arrow)')
       .classed("link", true)
       .attr("d", function(d){
         return "M" + d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y;
@@ -605,6 +510,12 @@ function create_linger() {
   var svg = d3.select(settings.appendElSpec).append("svg")
         .attr("width", width)
         .attr("height", height);
+  // Store graph offset for use with HTML elements in the graph.
+  var graphRect = d3.select(settings.appendElSpec).node()
+        .getBoundingClientRect();
+  svg
+      .attr("htmlX", graphRect.left)
+      .attr("htmlY", graphRect.top);
   var graph = new GraphCreator(svg, nodes, edges);
   
   graph.setIdCt(2);
